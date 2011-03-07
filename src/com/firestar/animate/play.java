@@ -15,12 +15,12 @@ class play extends Thread {
 		p=plugin;
 		open_anime=name;
 		animation=anim;
-		framespeed = speed;
+		framespeed=speed;
 		animation.on_time=0;
 	}
 	public void run(){
-		Boolean playing = true;
-		Integer time = 0;
+		boolean playing = true;
+		int time = 0;
 		p.animations_playing.put(open_anime,true);
 		while ( playing ) {
 			if ( time == 0 ) {

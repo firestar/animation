@@ -27,7 +27,7 @@ class frameset {
 		frames.put(frames.size(),g);
 	}
 	public void output(Integer num,frame frame_blocks){
-		try{
+		/*try{
 			FileWriter fstream = new FileWriter("out_frame_"+num+"_data.txt");
 		    BufferedWriter out = new BufferedWriter(fstream);
 		    out.write(frame_blocks.frame_blocks_data.toString());
@@ -42,7 +42,7 @@ class frameset {
 		    out.close();
 	    }catch (Exception e){//Catch exception if any
 	      System.err.println("Error: " + e.getMessage());
-	    }
+	    }*/
 	}
 	public boolean first(){
 		frame this_frame = null;
@@ -55,7 +55,7 @@ class frameset {
 	}
 	public boolean next(){
 		frame this_frame = null;
-		if((on_time+1)<frames.size()){
+		if(on_time<frames.size()){
 			++on_time;
 			this_frame = frames.get(on_time);
 			output(on_time,this_frame);
