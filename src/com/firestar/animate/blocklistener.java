@@ -17,11 +17,11 @@ public class blocklistener extends BlockListener {
 		if(event.getPlayer().getItemInHand().getType()==Material.WOOD_HOE){
 			Player player = event.getPlayer();
 			String Sender_Name = player.getName();
-			if(!p.open_animations.containsKey(Sender_Name)){
+			if(!p.hasOpenAnimation(Sender_Name)){
 				player.sendMessage("No animation selected");
 			}else{
-				String open_anime=p.open_animations.get(Sender_Name);
-				if(p.animations_edit.get(open_anime)){
+				String open_anime=p.getOpenAnimation(Sender_Name);
+				if(!p.isAnimationSet(open_anime)){
 					if(p.player_pos.containsKey(Sender_Name)){
 						Hashtable<Integer,Location> jsu = p.player_pos.get(Sender_Name);
 						jsu.put(1, event.getBlock().getLocation());
@@ -40,11 +40,11 @@ public class blocklistener extends BlockListener {
 		if(event.getPlayer().getItemInHand().getType()==Material.WOOD_HOE){
 			Player player = event.getPlayer();
 			String Sender_Name = player.getName();
-			if(!p.open_animations.containsKey(Sender_Name)){
+			if(!p.hasOpenAnimation(Sender_Name)){
 				player.sendMessage("No animation selected");
 			}else{
-				String open_anime=p.open_animations.get(Sender_Name);
-				if(p.animations_edit.get(open_anime)){
+				String open_anime=p.getOpenAnimation(Sender_Name);
+				if(!p.isAnimationSet(open_anime)){
 					if(p.player_pos.containsKey(Sender_Name)){
 						Hashtable<Integer,Location> jsu = p.player_pos.get(Sender_Name);
 						jsu.put(0, event.getBlock().getLocation());
