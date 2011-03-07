@@ -1,0 +1,28 @@
+name: Animation
+main: com.firestar.animate.animate
+version: 1.0
+commands:
+  cra:
+    description: 
+    usage: /cra
+  opa:
+    description: 
+    usage: /opa
+  cla:
+    description: 
+    usage: /cla
+  sea:
+    description: 
+    usage: /sea
+  saf:
+    description: 
+    usage: /saf
+  play:
+    description: 
+    usage: /play
+  stp:
+    description: 
+    usage: /stp
+  gtf:
+    description: 
+    usage: /gtf
