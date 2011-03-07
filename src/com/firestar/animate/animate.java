@@ -100,13 +100,13 @@ public class animate extends JavaPlugin {
         } else if (commandName.equalsIgnoreCase("sea")) {
             if (hasOpenAnimation(Sender_Name)) {
                 String open_anime = getOpenAnimation(Sender_Name);
-                if (isAnimationSet(open_anime)) {
+                if (!isAnimationSet(open_anime)) {
                     if (player_pos.containsKey(Sender_Name)) {
                         Hashtable<Integer, Location> jsu = player_pos.get(Sender_Name);
                         if (jsu.containsKey(0) && jsu.containsKey(1)) {
                             area j = new area(this, player.getWorld(), jsu.get(0), jsu.get(1));
                             animations_save_locations.put(open_anime, j.get_blocks());
-                            animations_edit.put(open_anime, false);
+                            setAnimation(open_anime);
                             player.sendMessage("Animation is now set, use saf to set frame!" + j.get_blocks().size());
                         } else {
                             player.sendMessage("select the positions!");
@@ -165,7 +165,7 @@ public class animate extends JavaPlugin {
         } else if (commandName.equalsIgnoreCase("play")) {
             if (hasOpenAnimation(Sender_Name)) {
                 String open_anime = getOpenAnimation(Sender_Name);
-                if (!isAnimationSet(open_anime)) {
+                if (isAnimationSet(open_anime)) {
                     if (!isPlaying(open_anime)) {
                         Thread animation_player = null;
                         if (args.length == 1) {
@@ -200,7 +200,7 @@ public class animate extends JavaPlugin {
         } else if (commandName.equalsIgnoreCase("stp")) {
             if (hasOpenAnimation(Sender_Name)) {
                 String open_anime = getOpenAnimation(Sender_Name);
-                if (!isAnimationSet(open_anime)) {
+                if (isAnimationSet(open_anime)) {
                     if (isPlaying(open_anime)) {
                         if (animations_repeat.get(open_anime)) {
                             player.sendMessage("Repeat turned off!");
@@ -221,7 +221,7 @@ public class animate extends JavaPlugin {
         } else if (commandName.equalsIgnoreCase("gtf")) {
             if (hasOpenAnimation(Sender_Name)) {
                 String open_anime = getOpenAnimation(Sender_Name);
-                if (!isAnimationSet(open_anime)) {
+                if (isAnimationSet(open_anime)) {
                     if (args.length == 1) {
                         if (args[0].equalsIgnoreCase("lt")) {
                             frameset g = getFrameset(open_anime);
@@ -279,6 +279,10 @@ public class animate extends JavaPlugin {
      */
     frameset getFrameset(String animationName) {
         return animations.get(animationName);
+    }
+
+    private Boolean setAnimation(String animationName) {
+        return animations_edit.put(animationName, false);
     }
 
     /**
