@@ -6,7 +6,6 @@ import java.util.logging.Logger;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -55,15 +54,7 @@ public class animate extends JavaPlugin {
             } else {
                 if (args.length == 1) {
                     if (!animationExists(args[0])) {
-                        World Players_World = player.getWorld();
-                        Hashtable<Integer, Location> block_positions = new Hashtable<Integer, Location>();
-                        frameset t = new frameset(args[0], this, Players_World);
-                        animations.put(args[0], t);
-                        animations_save_locations.put(args[0], block_positions);
-                        openAnimation(Sender_Name, args[0]);
-                        animations_edit.put(args[0], true);
-                        animations_playing.put(args[0], false);
-                        animations_repeat.put(args[0], false);
+                        createNewAnimation(args[0], player);
                         player.sendMessage("Animation created!");
                     } else {
                         player.sendMessage("Animation with that name already exists!");
@@ -262,6 +253,21 @@ public class animate extends JavaPlugin {
             return true;
         }
         return false;
+    }
+
+    /**
+     * @param name
+     * @param player
+     */
+    private void createNewAnimation(String name, Player player) {
+        frameset t = new frameset(name, this, player.getWorld());
+        animations.put(name, t);
+        Hashtable<Integer, Location> block_positions = new Hashtable<Integer, Location>();
+        animations_save_locations.put(name, block_positions);
+        openAnimation(player.getName(), name);
+        animations_edit.put(name, true);
+        animations_playing.put(name, false);
+        animations_repeat.put(name, false);
     }
 
     public boolean is_integer(String input) {
