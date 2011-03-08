@@ -1,8 +1,5 @@
 package com.firestar.animate;
 
-import java.util.Hashtable;
-
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockDamageEvent;

@@ -5,7 +5,6 @@ class play extends Thread {
     animate p;
     private Integer framespeed;
     private frameset frames = null;
-    private String open_anime;
     private Animation animation;
 
     public play(animate plugin, Animation animation) {
