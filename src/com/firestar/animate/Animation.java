@@ -25,11 +25,12 @@ public class Animation {
     private Map<Location, Byte> lastFrameBytes;
     private Map<Location, Material> lastFrameTypes;
 
-    public Animation() {
-        this(false);
+    public Animation(frameset frames) {
+        this(frames, false);
     }
-    public Animation(boolean repeat) {
+    public Animation(frameset frames, boolean repeat) {
         super();
+        this.frames = frames;
         this.playing = false;
         this.repeat  = repeat;
         this.areaSet = false;

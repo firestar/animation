@@ -19,21 +19,13 @@ public class blocklistener extends BlockListener {
     public void onBlockRightClick(BlockRightClickEvent event) {
         if (event.getPlayer().getItemInHand().getType() == Material.WOOD_HOE) {
             Player player = event.getPlayer();
-            String Sender_Name = player.getName();
-            if (!p.hasOpenAnimation(Sender_Name)) {
+            Animator animator = p.getAnimator(player.getName());
+            if (!animator.hasOpenAnimation()) {
                 player.sendMessage("No animation selected");
             } else {
-                String open_anime = p.getOpenAnimation(Sender_Name);
-                if (!p.isAnimationSet(open_anime)) {
-                    if (p.player_pos.containsKey(Sender_Name)) {
-                        Hashtable<Integer, Location> jsu = p.player_pos.get(Sender_Name);
-                        jsu.put(1, event.getBlock().getLocation());
-                        p.player_pos.put(Sender_Name, jsu);
-                    } else {
-                        Hashtable<Integer, Location> jsu = new Hashtable<Integer, Location>();
-                        jsu.put(1, event.getBlock().getLocation());
-                        p.player_pos.put(Sender_Name, jsu);
-                    }
+                Animation open_anime = animator.getOpenAnimation();
+                if (!open_anime.isAreaSet()) {
+                    animator.setLoc2(event.getBlock().getLocation());
                     player.sendMessage("Position 2 saved!");
                 }
             }
@@ -43,21 +35,13 @@ public class blocklistener extends BlockListener {
     public void onBlockDamage(BlockDamageEvent event) {
         if (event.getPlayer().getItemInHand().getType() == Material.WOOD_HOE) {
             Player player = event.getPlayer();
-            String Sender_Name = player.getName();
-            if (!p.hasOpenAnimation(Sender_Name)) {
+            Animator animator = p.getAnimator(player.getName());
+            if (!animator.hasOpenAnimation()) {
                 player.sendMessage("No animation selected");
             } else {
-                String open_anime = p.getOpenAnimation(Sender_Name);
-                if (!p.isAnimationSet(open_anime)) {
-                    if (p.player_pos.containsKey(Sender_Name)) {
-                        Hashtable<Integer, Location> jsu = p.player_pos.get(Sender_Name);
-                        jsu.put(0, event.getBlock().getLocation());
-                        p.player_pos.put(Sender_Name, jsu);
-                    } else {
-                        Hashtable<Integer, Location> jsu = new Hashtable<Integer, Location>();
-                        jsu.put(0, event.getBlock().getLocation());
-                        p.player_pos.put(Sender_Name, jsu);
-                    }
+                Animation open_anime = animator.getOpenAnimation();
+                if (!open_anime.isAreaSet()) {
+                    animator.setLoc1(event.getBlock().getLocation());
                     player.sendMessage("Position 1 saved!");
                 }
             }

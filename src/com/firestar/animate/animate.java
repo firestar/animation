@@ -1,7 +1,7 @@
 package com.firestar.animate;
 
 import java.util.Hashtable;
-import java.util.Map.Entry;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.bukkit.Location;
@@ -18,15 +18,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class animate extends JavaPlugin {
     public Logger log = Logger.getLogger("Minecraft");
     private final blocklistener blockListener = new blocklistener(this);
-    public Hashtable<String, frameset> animations = new Hashtable<String, frameset>();
-    public Hashtable<String, Boolean> animations_edit = new Hashtable<String, Boolean>();
-    public Hashtable<String, Boolean> animations_playing = new Hashtable<String, Boolean>();
-    public Hashtable<String, Boolean> animations_repeat = new Hashtable<String, Boolean>();
-    public Hashtable<String, String> open_animations = new Hashtable<String, String>();
-    public Hashtable<String, Hashtable<Integer, Location>> player_pos = new Hashtable<String, Hashtable<Integer, Location>>();
-    public Hashtable<String, Hashtable<Location, Byte>> animations_last_frame_byte = new Hashtable<String, Hashtable<Location, Byte>>();
-    public Hashtable<String, Hashtable<Location, Material>> animations_last_frame_type = new Hashtable<String, Hashtable<Location, Material>>();
-    public Hashtable<String, Hashtable<Integer, Location>> animations_save_locations = new Hashtable<String, Hashtable<Integer, Location>>();
+    private Map<String, Animation> animations = new Hashtable<String, Animation>();
+    private Map<String, Animator> animators = new Hashtable<String, Animator>();
 
     public void onEnable() {
         PluginManager pm = getServer().getPluginManager();
@@ -47,13 +40,14 @@ public class animate extends JavaPlugin {
             log.info("Cannot execute any commands from console for this plugin :(");
             return false;
         }
-        String Sender_Name = player.getName();
+        Animator animator = getAnimator(player.getName());
         if (commandName.equalsIgnoreCase("cra")) {
-            if (hasOpenAnimation(Sender_Name)) {
+            if (animator.hasOpenAnimation()) {
                 player.sendMessage("Already have animation open!");
             } else {
                 if (args.length == 1) {
-                    if (!animationExists(args[0])) {
+                    Animation animation = getAnimation(args[0]);
+                    if (animation == null) {
                         createNewAnimation(args[0], player);
                         player.sendMessage("Animation created!");
                     } else {
@@ -65,20 +59,21 @@ public class animate extends JavaPlugin {
             }
             return true;
         } else if (commandName.equalsIgnoreCase("cla")) {
-            if (!hasOpenAnimation(Sender_Name)) {
+            if (!animator.hasOpenAnimation()) {
                 player.sendMessage("Animation is not open!");
             } else {
-                closeAnimation(Sender_Name);
+                animator.closeAnimation();
                 player.sendMessage("Animation  closed!");
             }
             return true;
         } else if (commandName.equalsIgnoreCase("opa")) {
-            if (hasOpenAnimation(Sender_Name)) {
+            if (animator.hasOpenAnimation()) {
                 player.sendMessage("Animation already open, please close it!");
             } else {
                 if (args.length == 1) {
-                    if (animationExists(args[0])) {
-                        openAnimation(Sender_Name, args[0]);
+                    Animation animation = getAnimation(args[0]);
+                    if (animation == null) {
+                        animator.openAnimation(animation);
                         player.sendMessage("Animation opened!");
                     } else {
                         player.sendMessage("Animation with that name does not exist!");
@@ -89,10 +84,13 @@ public class animate extends JavaPlugin {
             }
             return true;
         } else if (commandName.equalsIgnoreCase("sea")) {
-            if (hasOpenAnimation(Sender_Name)) {
-                String open_anime = getOpenAnimation(Sender_Name);
-                if (!isAnimationSet(open_anime)) {
-                    if (player_pos.containsKey(Sender_Name)) {
+            if (animator.hasOpenAnimation()) {
+                Animation open_anime = animator.getOpenAnimation();
+                if (!open_anime.isAreaSet()) {
+                    if (animator.locationsSet()) {
+                        Area area = new Area(this, player.getWorld(), animator.getLoc1(), animator.getLoc2());
+                        open_anime.setArea(area);
+                        /*
                         Hashtable<Integer, Location> jsu = player_pos.get(Sender_Name);
                         if (jsu.containsKey(0) && jsu.containsKey(1)) {
                             area j = new area(this, player.getWorld(), jsu.get(0), jsu.get(1));
@@ -102,6 +100,7 @@ public class animate extends JavaPlugin {
                         } else {
                             player.sendMessage("select the positions!");
                         }
+                        */
                     } else {
                         player.sendMessage("select the positions!");
                     }
@@ -113,39 +112,40 @@ public class animate extends JavaPlugin {
             }
             return true;
         } else if (commandName.equalsIgnoreCase("saf")) {
-            if (hasOpenAnimation(Sender_Name)) {
-                String open_anime = getOpenAnimation(Sender_Name);
-                if (isAnimationSet(open_anime)) {
-                    frameset this_frameset = getFrameset(open_anime);
+            if (animator.hasOpenAnimation()) {
+                Animation open_anime = animator.getOpenAnimation();
+                if (open_anime.isAreaSet()) {
+                    frameset this_frameset = open_anime.getFrames();
                     if (this_frameset.frames.size() == 0) {
                         Hashtable<Integer, Block> blocks = new Hashtable<Integer, Block>();
-                        for (Entry<Integer, Location> entry : animations_save_locations.get(open_anime).entrySet()) {
-                            blocks.put(blocks.size(), this_frameset.this_world.getBlockAt(entry.getValue()));
+                        for (Location location : open_anime.getArea().get_blocks()) {
+                            blocks.put(blocks.size(), this_frameset.this_world.getBlockAt(location));
                         }
                         this_frameset.add_frame(blocks);
-                        animations_last_frame_byte.put(open_anime, this_frameset.frames.get((this_frameset.frames.size() - 1)).frame_blocks_data);
-                        animations_last_frame_type.put(open_anime, this_frameset.frames.get((this_frameset.frames.size() - 1)).frame_blocks_type);
+                        // TODO this should be unnecessary = just access the last frame of the framset when needed
+                        open_anime.setLastFrameBytes(this_frameset.frames.get((this_frameset.frames.size() - 1)).frame_blocks_data);
+                        open_anime.setLastFrameTypes(this_frameset.frames.get((this_frameset.frames.size() - 1)).frame_blocks_type);
                         player.sendMessage("Initial frame saved: " + blocks.size() + " Saved Frame: " + this_frameset.frames.size());
                     } else {
                         Hashtable<Integer, Block> blocks = new Hashtable<Integer, Block>();
-                        Hashtable<Location, Material> jprevtype = animations_last_frame_type.get(open_anime);
-                        Hashtable<Location, Byte> jprevbyte = animations_last_frame_byte.get(open_anime);
-                        for (Entry<Integer, Location> entry : animations_save_locations.get(open_anime).entrySet()) {
-                            if (this_frameset.this_world.getBlockAt(entry.getValue()).getType() != jprevtype.get(entry.getValue())) {
-                                blocks.put(blocks.size(), this_frameset.this_world.getBlockAt(entry.getValue()));
-                                jprevtype.put(entry.getValue(), this_frameset.this_world.getBlockAt(entry.getValue()).getType());
-                                jprevbyte.put(entry.getValue(), this_frameset.this_world.getBlockAt(entry.getValue()).getData());
-                            } else if (this_frameset.this_world.getBlockAt(entry.getValue()).getData() != jprevbyte.get(entry.getValue())) {
-                                blocks.put(blocks.size(), this_frameset.this_world.getBlockAt(entry.getValue()));
-                                jprevbyte.put(entry.getValue(), this_frameset.this_world.getBlockAt(entry.getValue()).getData());
+                        Map<Location, Material> jprevtype = open_anime.getLastFrameTypes();
+                        Map<Location, Byte> jprevbyte = open_anime.getLastFrameBytes();
+                        for (Location location : open_anime.getArea().get_blocks()) {
+                            if (this_frameset.this_world.getBlockAt(location).getType() != jprevtype.get(location)) {
+                                blocks.put(blocks.size(), this_frameset.this_world.getBlockAt(location));
+                                jprevtype.put(location, this_frameset.this_world.getBlockAt(location).getType());
+                                jprevbyte.put(location, this_frameset.this_world.getBlockAt(location).getData());
+                            } else if (this_frameset.this_world.getBlockAt(location).getData() != jprevbyte.get(location)) {
+                                blocks.put(blocks.size(), this_frameset.this_world.getBlockAt(location));
+                                jprevbyte.put(location, this_frameset.this_world.getBlockAt(location).getData());
                             }
                         }
                         this_frameset.add_frame(blocks);
-                        animations_last_frame_byte.put(open_anime, jprevbyte);
-                        animations_last_frame_type.put(open_anime, jprevtype);
+                        open_anime.setLastFrameBytes(jprevbyte);
+                        open_anime.setLastFrameTypes(jprevtype);
                         player.sendMessage("blocks set to frame! changes: " + blocks.size() + " Saved Frame: " + this_frameset.frames.size());
                     }
-                    animations.put(open_anime, this_frameset);
+                    //animation_frame_sets.put(open_anime, this_frameset); // unnecessary because the frame set should be modified itself - doesn't need to be readded to the map
                 } else {
                     player.sendMessage("Animation not set!");
                 }
@@ -154,27 +154,27 @@ public class animate extends JavaPlugin {
             }
             return true;
         } else if (commandName.equalsIgnoreCase("play")) {
-            if (hasOpenAnimation(Sender_Name)) {
-                String open_anime = getOpenAnimation(Sender_Name);
-                if (isAnimationSet(open_anime)) {
-                    if (!isPlaying(open_anime)) {
+            if (animator.hasOpenAnimation()) {
+                Animation open_anime = animator.getOpenAnimation();
+                if (open_anime.isAreaSet()) {
+                    if (!open_anime.isPlaying()) {
                         Thread animation_player = null;
                         if (args.length == 1) {
                             if (args[0].equalsIgnoreCase("t")) {
-                                animations_repeat.put(open_anime, true);
-                                animation_player = new play(this, getFrameset(open_anime), open_anime);
+                                open_anime.setRepeat(true);
+                                animation_player = new play(this, open_anime);
                             } else {
-                                animations_repeat.put(open_anime, false);
-                                animation_player = new play(this, getFrameset(open_anime), open_anime, Integer.valueOf(args[0]));
+                                open_anime.setRepeat(false);
+                                animation_player = new play(this, open_anime, Integer.valueOf(args[0]));
                             }
                         } else if (args.length == 2) {
                             if (args[1].equalsIgnoreCase("t")) {
-                                animations_repeat.put(open_anime, true);
+                                open_anime.setRepeat(true);
                             }
-                            animation_player = new play(this, getFrameset(open_anime), open_anime, Integer.valueOf(args[0]));
+                            animation_player = new play(this, open_anime, Integer.valueOf(args[0]));
                         } else {
-                            animations_repeat.put(open_anime, false);
-                            animation_player = new play(this, getFrameset(open_anime), open_anime);
+                            open_anime.setRepeat(false);
+                            animation_player = new play(this, open_anime);
                         }
                         animation_player.start();
                         player.sendMessage("Now Playing!");
@@ -189,13 +189,13 @@ public class animate extends JavaPlugin {
             }
             return true;
         } else if (commandName.equalsIgnoreCase("stp")) {
-            if (hasOpenAnimation(Sender_Name)) {
-                String open_anime = getOpenAnimation(Sender_Name);
-                if (isAnimationSet(open_anime)) {
-                    if (isPlaying(open_anime)) {
-                        if (animations_repeat.get(open_anime)) {
+            if (animator.hasOpenAnimation()) {
+                Animation open_anime = animator.getOpenAnimation();
+                if (open_anime.isAreaSet()) {
+                    if (open_anime.isPlaying()) {
+                        if (open_anime.isRepeat()) {
                             player.sendMessage("Repeat turned off!");
-                            animations_repeat.put(open_anime, false);
+                            open_anime.setRepeat(false);
                         } else {
                             player.sendMessage("Repeat already off!");
                         }
@@ -210,12 +210,12 @@ public class animate extends JavaPlugin {
             }
             return true;
         } else if (commandName.equalsIgnoreCase("gtf")) {
-            if (hasOpenAnimation(Sender_Name)) {
-                String open_anime = getOpenAnimation(Sender_Name);
-                if (isAnimationSet(open_anime)) {
+            if (animator.hasOpenAnimation()) {
+                Animation open_anime = animator.getOpenAnimation();
+                if (open_anime.isAreaSet()) {
                     if (args.length == 1) {
                         if (args[0].equalsIgnoreCase("lt")) {
-                            frameset g = getFrameset(open_anime);
+                            frameset g = open_anime.getFrames();
                             Integer hi = 0;
                             while (hi < g.frames.size()) {
                                 g.gt(hi);
@@ -223,11 +223,11 @@ public class animate extends JavaPlugin {
                             }
                             player.sendMessage("frame " + g.frames.size() + "!");
                         } else if (args[0].equalsIgnoreCase("ft")) {
-                            frameset g = getFrameset(open_anime);
+                            frameset g = open_anime.getFrames();
                             g.gt(0);
                             player.sendMessage("frame 1!");
                         } else if (is_integer(args[0])) {
-                            frameset g = getFrameset(open_anime);
+                            frameset g = open_anime.getFrames();
                             if (g.frames.size() >= Integer.valueOf(args[0])) {
                                 Integer hi = 0;
                                 while (hi < Integer.valueOf(args[0])) {
@@ -256,18 +256,38 @@ public class animate extends JavaPlugin {
     }
 
     /**
+     * The animation with this name.
+     * @param name The name of the animation.
+     * @return null if the animation does not yet exist.
+     */
+    public Animation getAnimation(String name) {
+        return animations.get(name);
+    }
+
+    /**
+     * The animator with this name.
+     * @param name The name of the animator.
+     * @return The animator, or a new animator if it does not yet exist.
+     */
+    public Animator getAnimator(String name) {
+        Animator animator = animators.get(name);
+        if (animator == null) {
+            animator = new Animator();
+            animators.put(name, animator);
+        }
+        return animator;
+    }
+
+    /**
+     * 
+     * WARNING: currently will override any existing animation of the same name.
      * @param name
      * @param player
      */
     private void createNewAnimation(String name, Player player) {
-        frameset t = new frameset(name, this, player.getWorld());
-        animations.put(name, t);
-        Hashtable<Integer, Location> block_positions = new Hashtable<Integer, Location>();
-        animations_save_locations.put(name, block_positions);
-        openAnimation(player.getName(), name);
-        animations_edit.put(name, true);
-        animations_playing.put(name, false);
-        animations_repeat.put(name, false);
+        Animation animation = new Animation(new frameset(name, this, player.getWorld()));
+        getAnimator(player.getName()).openAnimation(animation);
+        animations.put(name, animation);
     }
 
     public boolean is_integer(String input) {
@@ -279,72 +299,5 @@ public class animate extends JavaPlugin {
         return false;
     }
 
-    /**
-     * @param animationName
-     * @return
-     */
-    frameset getFrameset(String animationName) {
-        return animations.get(animationName);
-    }
-
-    private Boolean setAnimation(String animationName) {
-        return animations_edit.put(animationName, false);
-    }
-
-    /**
-     * @param animationName
-     * @return
-     */
-    boolean isAnimationSet(String animationName) {
-        return !animations_edit.get(animationName);
-    }
-
-    /**
-     * @param player
-     * @param animationName
-     * @return
-     */
-    String openAnimation(String player, String animationName) {
-        return open_animations.put(player, animationName);
-    }
-
-    /**
-     * @param player
-     * @return
-     */
-    String closeAnimation(String player) {
-        return open_animations.remove(player);
-    }
-
-    /**
-     * @param animationName
-     * @return
-     */
-    boolean animationExists(String animationName) {
-        return animations.containsKey(animationName);
-    }
-
-    /**
-     * @param animationName
-     * @return
-     */
-    boolean isPlaying(String animationName) {
-        return animations_playing.get(animationName);
-    }
-
-    /**
-     * @param player
-     * @return
-     */
-    boolean hasOpenAnimation(String player) {
-        return open_animations.containsKey(player);
-    }
-
-    /**
-     * @param player
-     * @return
-     */
-    String getOpenAnimation(String player) {
-        return open_animations.get(player);
-    }
+    
 }

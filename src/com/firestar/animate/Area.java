@@ -6,13 +6,13 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.World;
 
-class area {
+class Area {
     private World this_world = null;
     private Location location1 = null;
     private Location location2 = null;
     private List<Location> blocks;
 
-    public area(animate main_plugin, World world, Location loc1, Location loc2) {
+    public Area(animate main_plugin, World world, Location loc1, Location loc2) {
         this_world = world;
         location1 = loc1;
         location2 = loc2;
