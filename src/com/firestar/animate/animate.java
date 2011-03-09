@@ -75,7 +75,7 @@ public class animate extends JavaPlugin {
             } else {
                 if (args.length == 1) {
                     Animation animation = getAnimation(args[0]);
-                    if (animation == null) {
+                    if (animation != null) {
                         animator.openAnimation(animation);
                         player.sendMessage("Animation opened!");
                     } else {
