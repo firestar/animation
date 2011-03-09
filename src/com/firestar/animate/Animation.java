@@ -3,11 +3,6 @@
  */
 package com.firestar.animate;
 
-import java.util.Map;
-
-import org.bukkit.Location;
-import org.bukkit.Material;
-
 /**
  * An animation of MineCraft blocks.
  * Includes the frame set that describes each frame of the animation, 
@@ -22,9 +17,6 @@ public class Animation {
     private boolean repeat;
     private boolean areaSet;
     private Area area;
-    private Map<Location, Byte> lastFrameBytes;
-    private Map<Location, Material> lastFrameTypes;
-
     public Animation(frameset frames) {
         this(frames, false);
     }
@@ -91,18 +83,6 @@ public class Animation {
      */
     public final frameset getFrames() {
         return frames;
-    }
-    public void setLastFrameBytes(Map<Location, Byte> lastFrameBytes) {
-        this.lastFrameBytes = lastFrameBytes;
-    }
-    public Map<Location, Byte> getLastFrameBytes() {
-        return lastFrameBytes;
-    }
-    public void setLastFrameTypes(Map<Location, Material> lastFrameTypes) {
-        this.lastFrameTypes = lastFrameTypes;
-    }
-    public Map<Location, Material> getLastFrameTypes() {
-        return lastFrameTypes;
     }
 
 }

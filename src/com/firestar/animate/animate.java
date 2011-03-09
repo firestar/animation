@@ -126,27 +126,19 @@ public class animate extends JavaPlugin {
                             blocks.put(blocks.size(), this_frameset.this_world.getBlockAt(location));
                         }
                         this_frameset.add_frame(blocks);
-                        // TODO this should be unnecessary = just access the last frame of the framset when needed
-                        open_anime.setLastFrameBytes(this_frameset.frames.get((this_frameset.frames.size() - 1)).frame_blocks_data);
-                        open_anime.setLastFrameTypes(this_frameset.frames.get((this_frameset.frames.size() - 1)).frame_blocks_type);
                         player.sendMessage("Initial frame saved: " + blocks.size() + " Saved Frame: " + this_frameset.frames.size());
                     } else {
                         Hashtable<Integer, Block> blocks = new Hashtable<Integer, Block>();
-                        Map<Location, Material> jprevtype = open_anime.getLastFrameTypes();
-                        Map<Location, Byte> jprevbyte = open_anime.getLastFrameBytes();
+                        Map<Location, Material> jprevtype = this_frameset.frames.get((this_frameset.frames.size() - 1)).frame_blocks_type;
+                        Map<Location, Byte> jprevbyte = this_frameset.frames.get((this_frameset.frames.size() - 1)).frame_blocks_data;
                         for (Location location : open_anime.getArea().get_blocks()) {
                             if (this_frameset.this_world.getBlockAt(location).getType() != jprevtype.get(location)) {
                                 blocks.put(blocks.size(), this_frameset.this_world.getBlockAt(location));
-                                jprevtype.put(location, this_frameset.this_world.getBlockAt(location).getType());
-                                jprevbyte.put(location, this_frameset.this_world.getBlockAt(location).getData());
                             } else if (this_frameset.this_world.getBlockAt(location).getData() != jprevbyte.get(location)) {
                                 blocks.put(blocks.size(), this_frameset.this_world.getBlockAt(location));
-                                jprevbyte.put(location, this_frameset.this_world.getBlockAt(location).getData());
                             }
                         }
                         this_frameset.add_frame(blocks);
-                        open_anime.setLastFrameBytes(jprevbyte);
-                        open_anime.setLastFrameTypes(jprevtype);
                         player.sendMessage("blocks set to frame! changes: " + blocks.size() + " Saved Frame: " + this_frameset.frames.size());
                     }
                     //animation_frame_sets.put(open_anime, this_frameset); // unnecessary because the frame set should be modified itself - doesn't need to be readded to the map
