@@ -51,7 +51,7 @@ class frameset {
 
     public boolean next() {
         frame this_frame = null;
-        if (on_time < frames.size()) {
+        if (on_time + 1 < frames.size()) {
             ++on_time;
             this_frame = frames.get(on_time);
             output(on_time, this_frame);
