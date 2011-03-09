@@ -90,6 +90,7 @@ public class animate extends JavaPlugin {
                     if (animator.locationsSet()) {
                         Area area = new Area(this, player.getWorld(), animator.getLoc1(), animator.getLoc2());
                         open_anime.setArea(area);
+                        player.sendMessage("Animation is now set, use saf to set frame! " + area.get_blocks().size());
                         /*
                         Hashtable<Integer, Location> jsu = player_pos.get(Sender_Name);
                         if (jsu.containsKey(0) && jsu.containsKey(1)) {
