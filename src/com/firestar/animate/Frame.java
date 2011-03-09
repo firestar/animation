@@ -8,12 +8,12 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
-class frame {
+class Frame {
     private World this_world = null;
     public Hashtable<Location, Material> frame_blocks_type = new Hashtable<Location, Material>();
     public Hashtable<Location, Byte> frame_blocks_data = new Hashtable<Location, Byte>();
 
-    public frame(animate main_plugin, World world) {
+    public Frame(Animate main_plugin, World world) {
         this_world = world;
     }
 

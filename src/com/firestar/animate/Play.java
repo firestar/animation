@@ -1,17 +1,17 @@
 package com.firestar.animate;
 
-class play extends Thread {
+class Play extends Thread {
     private static final int DEFAULT_FRAMESPEED = 500;
-    animate p;
+    Animate p;
     private Integer framespeed;
-    private frameset frames = null;
+    private Frameset frames = null;
     private Animation animation;
 
-    public play(animate plugin, Animation animation) {
+    public Play(Animate plugin, Animation animation) {
         this(plugin, animation, DEFAULT_FRAMESPEED);
     }
 
-    public play(animate plugin, Animation animation, Integer speed) {
+    public Play(Animate plugin, Animation animation, Integer speed) {
         p = plugin;
         this.animation = animation;
         frames = animation.getFrames();

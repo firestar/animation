@@ -6,10 +6,10 @@ import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockRightClickEvent;
 
-public class blocklistener extends BlockListener {
-    private animate p = null;
+public class AnimateBlockListener extends BlockListener {
+    private Animate p = null;
 
-    public blocklistener(animate plugin) {
+    public AnimateBlockListener(Animate plugin) {
         p = plugin;
     }
 

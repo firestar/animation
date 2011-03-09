@@ -16,9 +16,9 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class animate extends JavaPlugin {
+public class Animate extends JavaPlugin {
     public Logger log = Logger.getLogger("Minecraft");
-    private final blocklistener blockListener = new blocklistener(this);
+    private final AnimateBlockListener blockListener = new AnimateBlockListener(this);
     private Map<String, Animation> animations = new Hashtable<String, Animation>();
     private Map<String, Animator> animators = new Hashtable<String, Animator>();
 
@@ -119,7 +119,7 @@ public class animate extends JavaPlugin {
             if (animator.hasOpenAnimation()) {
                 Animation open_anime = animator.getOpenAnimation();
                 if (open_anime.isAreaSet()) {
-                    frameset this_frameset = open_anime.getFrames();
+                    Frameset this_frameset = open_anime.getFrames();
                     if (this_frameset.frames.size() == 0) {
                         Hashtable<Integer, Block> blocks = new Hashtable<Integer, Block>();
                         for (Location location : open_anime.getArea().get_blocks()) {
@@ -158,19 +158,19 @@ public class animate extends JavaPlugin {
                         if (args.length == 1) {
                             if (args[0].equalsIgnoreCase("t")) {
                                 open_anime.setRepeat(true);
-                                animation_player = new play(this, open_anime);
+                                animation_player = new Play(this, open_anime);
                             } else {
                                 open_anime.setRepeat(false);
-                                animation_player = new play(this, open_anime, Integer.valueOf(args[0]));
+                                animation_player = new Play(this, open_anime, Integer.valueOf(args[0]));
                             }
                         } else if (args.length == 2) {
                             if (args[1].equalsIgnoreCase("t")) {
                                 open_anime.setRepeat(true);
                             }
-                            animation_player = new play(this, open_anime, Integer.valueOf(args[0]));
+                            animation_player = new Play(this, open_anime, Integer.valueOf(args[0]));
                         } else {
                             open_anime.setRepeat(false);
-                            animation_player = new play(this, open_anime);
+                            animation_player = new Play(this, open_anime);
                         }
                         animation_player.start();
                         player.sendMessage("Now Playing!");
@@ -211,7 +211,7 @@ public class animate extends JavaPlugin {
                 if (open_anime.isAreaSet()) {
                     if (args.length == 1) {
                         if (args[0].equalsIgnoreCase("lt")) {
-                            frameset g = open_anime.getFrames();
+                            Frameset g = open_anime.getFrames();
                             Integer hi = 0;
                             while (hi < g.frames.size()) {
                                 g.gt(hi);
@@ -219,11 +219,11 @@ public class animate extends JavaPlugin {
                             }
                             player.sendMessage("frame " + g.frames.size() + "!");
                         } else if (args[0].equalsIgnoreCase("ft")) {
-                            frameset g = open_anime.getFrames();
+                            Frameset g = open_anime.getFrames();
                             g.gt(0);
                             player.sendMessage("frame 1!");
                         } else if (is_integer(args[0])) {
-                            frameset g = open_anime.getFrames();
+                            Frameset g = open_anime.getFrames();
                             if (g.frames.size() >= Integer.valueOf(args[0])) {
                                 Integer hi = 0;
                                 while (hi < Integer.valueOf(args[0])) {
@@ -281,7 +281,7 @@ public class animate extends JavaPlugin {
      * @param player
      */
     private void createNewAnimation(String name, Player player) {
-        Animation animation = new Animation(new frameset(name, this, player.getWorld()));
+        Animation animation = new Animation(new Frameset(name, this, player.getWorld()));
         getAnimator(player.getName()).openAnimation(animation);
         animations.put(name, animation);
     }

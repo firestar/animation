@@ -12,7 +12,7 @@ class Area {
     private Location location2 = null;
     private List<Location> blocks;
 
-    public Area(animate main_plugin, World world, Location loc1, Location loc2) {
+    public Area(Animate main_plugin, World world, Location loc1, Location loc2) {
         this_world = world;
         location1 = loc1;
         location2 = loc2;

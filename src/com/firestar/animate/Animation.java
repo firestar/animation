@@ -12,15 +12,15 @@ package com.firestar.animate;
  *
  */
 public class Animation {
-    private frameset frames;
+    private Frameset frames;
     private boolean playing;
     private boolean repeat;
     private boolean areaSet;
     private Area area;
-    public Animation(frameset frames) {
+    public Animation(Frameset frames) {
         this(frames, false);
     }
-    public Animation(frameset frames, boolean repeat) {
+    public Animation(Frameset frames, boolean repeat) {
         super();
         this.frames = frames;
         this.playing = false;
@@ -81,7 +81,7 @@ public class Animation {
     /**
      * @return the frame set that contains all the frames for this animation/
      */
-    public final frameset getFrames() {
+    public final Frameset getFrames() {
         return frames;
     }
 
