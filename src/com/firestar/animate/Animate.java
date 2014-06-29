@@ -3,7 +3,6 @@ package com.firestar.animate;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.logging.Logger;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -11,7 +10,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
-import org.bukkit.event.Event.Priority;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -24,8 +22,7 @@ public class Animate extends JavaPlugin {
 
     public void onEnable() {
         PluginManager pm = getServer().getPluginManager();
-        pm.registerEvent(Event.Type.BLOCK_RIGHTCLICKED, blockListener, Priority.Normal, this);
-        pm.registerEvent(Event.Type.BLOCK_DAMAGED, blockListener, Priority.Normal, this);
+        pm.registerEvents(new AnimateBlockListener(this), this);
         PluginDescriptionFile pdfFile = this.getDescription();
         System.out.println( pdfFile.getName() + " version " + pdfFile.getVersion() + " is enabled!" );
     }
@@ -93,7 +90,7 @@ public class Animate extends JavaPlugin {
                     if (animator.locationsSet()) {
                         Area area = new Area(this, player.getWorld(), animator.getLoc1(), animator.getLoc2());
                         open_anime.setArea(area);
-                        player.sendMessage("Animation is now set, use saf to set frame! " + area.get_blocks().size());
+                        player.sendMessage("Animation area is now set, use saf to set frame! " + area.get_blocks().size());
                         /*
                         Hashtable<Integer, Location> jsu = player_pos.get(Sender_Name);
                         if (jsu.containsKey(0) && jsu.containsKey(1)) {

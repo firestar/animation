@@ -1,5 +1,8 @@
 name: Animation
-main: com.firestar.animate.animate
+main: com.firestar.animate.Animate
+description: Animation Plugin
+website: http://synload.com/
+author: Firestar, Cogito
 version: 1.0
 commands:
   cra:
